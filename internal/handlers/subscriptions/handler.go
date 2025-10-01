@@ -3,10 +3,12 @@ package subscriptions
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/feproldo/effective-mobile/internal/dto"
 	subsService "github.com/feproldo/effective-mobile/internal/services/subscriptions"
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -50,8 +52,37 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
-	user_id := chi.URLParam("id")
-	list, err := h.services.Get(r.Context())
+	id := chi.URLParam(r, "id")
+	idParsed, err := strconv.Atoi(id)
+
+	if err != nil {
+		log.Err(err).Send()
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	sub, err := h.services.Get(r.Context(), int32(idParsed))
+
+	if err != nil {
+		log.Error().Err(err).Send()
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(sub)
+}
+
+func (h *Handler) GetByUserId(w http.ResponseWriter, r *http.Request) {
+	userId := chi.URLParam(r, "user_id")
+	userUUID, err := uuid.Parse(userId)
+	if err != nil {
+		log.Err(err).Send()
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	list, err := h.services.GetByUserId(r.Context(), userUUID)
+
 	if err != nil {
 		log.Error().Err(err).Send()
 		http.Error(w, "internal server error", http.StatusInternalServerError)

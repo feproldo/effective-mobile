@@ -43,7 +43,12 @@ func main() {
 	router.Route("/subscriptions", func(r chi.Router) {
 		r.Get("/", subsHandler.List)
 		r.Get("/{id}", subsHandler.Get)
+
+		r.Get("/user/{user_id}", subsHandler.GetByUserId)
+
 		r.Post("/", subsHandler.Create)
+
+		r.Delete("/{id}", subsHandler.Create)
 	})
 
 	port := os.Getenv("PORT")

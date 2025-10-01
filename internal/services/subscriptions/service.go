@@ -68,11 +68,8 @@ func (s *Services) Create(ctx context.Context, sub dto.Subscription) error {
 	return nil
 }
 
-func (s *Services) Get(ctx context.Context, user_id string) (*[]dto.Subscription, error) {
-	userUUID, err := uuid.Parse(user_id)
-	if err != nil {
-		return nil, err
-	}
+func (s *Services) GetByUserId(ctx context.Context, user_id uuid.UUID) (*[]dto.Subscription, error) {
+	userUUID := user_id
 	subsSql, err := s.queries.UserSubscriptions(ctx, userUUID)
 	if err != nil {
 		return nil, err
@@ -85,4 +82,15 @@ func (s *Services) Get(ctx context.Context, user_id string) (*[]dto.Subscription
 	}
 
 	return &subs, nil
+}
+
+func (s *Services) Get(ctx context.Context, id int32) (*dto.Subscription, error) {
+	subSql, err := s.queries.GetSubscription(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	sub := dto.FromSql(subSql)
+
+	return &sub, nil
 }
