@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/feproldo/effective-mobile/docs"
 	db "github.com/feproldo/effective-mobile/internal/db/generated"
 	subscriptionHandler "github.com/feproldo/effective-mobile/internal/handlers/subscriptions"
 	"github.com/feproldo/effective-mobile/internal/middlewares"
@@ -15,8 +16,11 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title Subscriptions service
+// @version 1.0
 func main() {
 	godotenv.Load()
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
@@ -40,6 +44,10 @@ func main() {
 
 	router.Use(middlewares.ZeroLogLogger)
 
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
+
 	router.Route("/subscriptions", func(r chi.Router) {
 		r.Get("/", subsHandler.List)
 		r.Get("/{id}", subsHandler.Get)
@@ -48,7 +56,11 @@ func main() {
 
 		r.Post("/", subsHandler.Create)
 
-		r.Delete("/{id}", subsHandler.Create)
+		r.Delete("/{id}", subsHandler.Delete)
+
+		r.Put("/{id}", subsHandler.Update)
+
+		r.Get("/sum", subsHandler.Sum)
 	})
 
 	port := os.Getenv("PORT")

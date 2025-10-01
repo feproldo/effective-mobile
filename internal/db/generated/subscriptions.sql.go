@@ -63,6 +63,45 @@ func (q *Queries) GetSubscription(ctx context.Context, id int32) (Subscription, 
 	return i, err
 }
 
+const getSubscriptionsWithFilter = `-- name: GetSubscriptionsWithFilter :many
+SELECT price FROM subscriptions WHERE ($1 = '' OR user_id = $1::uuid) AND ($2 = '' OR service_name = $2::text) AND ($3 = '' OR start_date >= TO_DATE($3, 'MM-YYYY')) AND ($4 = '' OR end_date <= TO_DATE($4, 'MM-YYYY'))
+`
+
+type GetSubscriptionsWithFilterParams struct {
+	Column1 interface{} `json:"column_1"`
+	Column2 interface{} `json:"column_2"`
+	Column3 interface{} `json:"column_3"`
+	Column4 interface{} `json:"column_4"`
+}
+
+func (q *Queries) GetSubscriptionsWithFilter(ctx context.Context, arg GetSubscriptionsWithFilterParams) ([]int32, error) {
+	rows, err := q.db.QueryContext(ctx, getSubscriptionsWithFilter,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []int32
+	for rows.Next() {
+		var price int32
+		if err := rows.Scan(&price); err != nil {
+			return nil, err
+		}
+		items = append(items, price)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const subscriptionsList = `-- name: SubscriptionsList :many
 SELECT id, service_name, price, user_id, start_date, end_date FROM subscriptions
 `

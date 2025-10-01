@@ -94,3 +94,43 @@ func (s *Services) Get(ctx context.Context, id int32) (*dto.Subscription, error)
 
 	return &sub, nil
 }
+
+func (s *Services) Delete(ctx context.Context, id int32) error {
+	err := s.queries.DeleteSubscription(ctx, id)
+	return err
+}
+
+func (s *Services) Update(ctx context.Context, id int32, sub dto.Subscription) error {
+	sqlSub, err := sub.ToSql()
+	if err != nil {
+		return err
+	}
+
+	updateSql := db.UpdateSubscriptionParams(*sqlSub)
+	updateSql.ID = id
+
+	err = s.queries.UpdateSubscription(ctx, updateSql)
+	return err
+}
+
+func (s *Services) Sum(ctx context.Context, startDate string, endDate string, userId string, serviceName string) (*int, error) {
+	sql := db.GetSubscriptionsWithFilterParams{
+		Column1: userId,
+		Column2: serviceName,
+		Column3: startDate,
+		Column4: endDate,
+	}
+
+	list, err := s.queries.GetSubscriptionsWithFilter(ctx, sql)
+	if err != nil {
+		return nil, err
+	}
+
+	sum := 0
+
+	for _, el := range list {
+		sum += int(el)
+	}
+
+	return &sum, nil
+}
