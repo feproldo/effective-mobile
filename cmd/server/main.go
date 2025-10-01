@@ -19,8 +19,8 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// @title Subscriptions service
-// @version 1.0
+// @title		Subscriptions service
+// @version	1.0
 func main() {
 	godotenv.Load()
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})

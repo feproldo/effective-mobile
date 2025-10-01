@@ -1,4 +1,106 @@
+definitions:
+  dto.Subscription:
+    properties:
+      end_date:
+        example: 08-2025
+        type: string
+      price:
+        example: 400
+        type: integer
+      service_name:
+        example: Yandex Plus
+        type: string
+      start_date:
+        example: 07-2025
+        type: string
+      user_id:
+        example: 60601fee-2bf1-4721-ae6f-7636e79a0cba
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+  title: Subscriptions service
+  version: "1.0"
+paths:
+  /subscriptions:
+    get:
+      description: Get list of the subscriptions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.Subscription'
+            type: array
+        "404":
+          description: Subscriptions list is empty
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get list of the subscriptions
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Add a new subscription
+      parameters:
+      - description: Subscription data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Subscription'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully added
+          schema:
+            type: string
+        "400":
+          description: Invalid JSON
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Add a new subscription
+      tags:
+      - subscriptions
+  /subscriptions/{id}:
+    get:
+      description: Get subscription by it's serial primary key
+      parameters:
+      - description: Serial primary key
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.Subscription'
+            type: array
+        "404":
+          description: Subscriptions list is empty
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get subscription by id
+      tags:
+      - subscriptions
 swagger: "2.0"

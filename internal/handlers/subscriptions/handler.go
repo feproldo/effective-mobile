@@ -24,7 +24,14 @@ func NewHandler(services *subsService.Services) *Handler {
 	}
 }
 
-// @Summary
+// @Summary      Get list of the subscriptions
+// @Description  Get list of the subscriptions
+// @Tags         subscriptions
+// @Produce      json
+// @Success      200  {array}   dto.Subscription
+// @Failure      404  string    "Subscriptions list is empty"
+// @Failure      500  string		"Internal error"
+// @Router       /subscriptions [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	list, err := h.services.List(r.Context())
 	if err != nil {
@@ -34,13 +41,23 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(*list) == 0 {
 		log.Info().Msg("subscriptions list is empty")
-		http.Error(w, "not found", http.StatusNotFound)
+		http.Error(w, "no content", http.StatusNoContent)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(list)
 }
 
+// @Summary      Add a new subscription
+// @Description  Add a new subscription
+// @Tags         subscriptions
+// @Accept       json
+// @Produce      json
+// @Param        request body      dto.Subscription true "Subscription data"
+// @Success      200     string    "Successfully added"
+// @Failure      400     string    "Invalid JSON"
+// @Failure      500     string		 "Internal error"
+// @Router       /subscriptions    [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var body dto.Subscription
 	err := json.NewDecoder(r.Body).Decode(&body)
@@ -59,6 +76,15 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("created"))
 }
 
+// @Summary      Get subscription by id
+// @Description  Get subscription by it's serial primary key
+// @Tags         subscriptions
+// @Produce      json
+// @Param        id      query      int true "Serial primary key"
+// @Success      200     {array}    dto.Subscription
+// @Failure      404     string     "Subscriptions list is empty"
+// @Failure      500     string		  "Internal error"
+// @Router       /subscriptions/{id} [get]
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	idParsed, err := strconv.Atoi(id)
