@@ -15,6 +15,8 @@ services:
 
   app:
     build: .
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/subscriptions?sslmode=disable
     container_name: subscriptions_app
     restart: always
     env_file:
