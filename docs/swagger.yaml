@@ -1,0 +1,227 @@
+definitions:
+  dto.Subscription:
+    properties:
+      end_date:
+        example: 08-2025
+        type: string
+      price:
+        example: 400
+        type: integer
+      service_name:
+        example: Yandex Plus
+        type: string
+      start_date:
+        example: 07-2025
+        type: string
+      user_id:
+        example: 60601fee-2bf1-4721-ae6f-7636e79a0cba
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Subscriptions service
+  version: "1.0"
+paths:
+  /subscriptions:
+    get:
+      description: Get list of the subscriptions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.Subscription'
+            type: array
+        "404":
+          description: Subscriptions list is empty
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get list of the subscriptions
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Add a new subscription
+      parameters:
+      - description: Subscription data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Subscription'
+      produces:
+      - text/plain
+      responses:
+        "201":
+          description: created
+          schema:
+            type: string
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: interbal server error
+          schema:
+            type: string
+      summary: Add a new subscription
+      tags:
+      - subscriptions
+  /subscriptions/{id}:
+    delete:
+      description: Delete subscription by its Serial Primary Key
+      parameters:
+      - description: Serial primary key
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - text/plain
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: user_id (UUID) not found
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Delete subscription by its id
+      tags:
+      - subscriptions
+    get:
+      description: Get subscription by it's serial primary key
+      parameters:
+      - description: Serial primary key
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Subscription'
+        "400":
+          description: Id not found
+          schema:
+            type: string
+        "404":
+          description: Subscription not found
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get subscription by id
+      tags:
+      - subscriptions
+    put:
+      description: Update subscription by its Serial Primary Key
+      parameters:
+      - description: Serial primary key
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Subscription data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Subscription'
+      produces:
+      - text/plain
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: user_id (UUID) not found
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Update subscription by its id
+      tags:
+      - subscriptions
+  /subscriptions/sum:
+    get:
+      description: Get subscription by it's serial primary key
+      parameters:
+      - description: user_id (UUID)
+        in: query
+        name: user_id
+        type: string
+      - description: Service name
+        in: query
+        name: servuce_name
+        type: string
+      - description: Start date (MM-YYYY)
+        in: query
+        name: start_date
+        type: string
+      - description: End date (MM-YYYY)
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sum
+          schema:
+            type: plain
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get subscription by id
+      tags:
+      - subscriptions
+  /subscriptions/user/{user_id}:
+    get:
+      description: Get subscription by user_id
+      parameters:
+      - description: user UUID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Subscription'
+        "400":
+          description: user_id (UUID) not found
+          schema:
+            type: string
+        "404":
+          description: Subscription not found
+          schema:
+            type: string
+        "500":
+          description: Internal error
+          schema:
+            type: string
+      summary: Get subscription by user_id
+      tags:
+      - subscriptions
+swagger: "2.0"
