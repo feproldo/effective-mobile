@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:17
+    container_name: subscriptions_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: subscriptions
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./internal/db/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    container_name: subscriptions_app
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  db_data:

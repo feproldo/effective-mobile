@@ -51,7 +51,7 @@ func (sub *Subscription) ToSql() (*db.Subscription, error) {
 
 	if sub.EndDate != nil {
 
-		endTime, err := time.Parse(TIME_FORMAT, sub.StartDate)
+		endTime, err := time.Parse(TIME_FORMAT, *sub.EndDate)
 		if err == nil {
 			endDate = sql.NullTime{
 				Valid: true,
