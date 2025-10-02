@@ -64,6 +64,9 @@ func main() {
 	})
 
 	port := os.Getenv("PORT")
+
 	log.Info().Msg("Service started on 0.0.0.0:" + port)
+	log.Info().Msg("Swagger started on 0.0.0.0:" + port + "/swagger/index.html")
+
 	http.ListenAndServe("0.0.0.0:"+port, router)
 }

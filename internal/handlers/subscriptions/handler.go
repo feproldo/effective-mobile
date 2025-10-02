@@ -52,11 +52,11 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 // @Description  Add a new subscription
 // @Tags         subscriptions
 // @Accept       json
-// @Produce      json
+// @Produce      plain
 // @Param        request body      dto.Subscription true "Subscription data"
-// @Success      200     string    "Successfully added"
-// @Failure      400     string    "Invalid JSON"
-// @Failure      500     string		 "Internal error"
+// @Success      201    string     "created"
+// @Failure      400    string     "bad request"
+// @Failure      500    string     "interbal server error"
 // @Router       /subscriptions    [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var body dto.Subscription
@@ -73,6 +73,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
 	w.Write([]byte("created"))
 }
 
@@ -80,9 +81,10 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Description  Get subscription by it's serial primary key
 // @Tags         subscriptions
 // @Produce      json
-// @Param        id      query      int true "Serial primary key"
-// @Success      200     {array}    dto.Subscription
-// @Failure      404     string     "Subscriptions list is empty"
+// @Param        id      path        int true "Serial primary key"
+// @Success      200     {object}    dto.Subscription
+// @Failure      400     string     "Id not found"
+// @Failure      404     string     "Subscription not found"
 // @Failure      500     string		  "Internal error"
 // @Router       /subscriptions/{id} [get]
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
@@ -111,6 +113,16 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sub)
 }
 
+// @Summary      Get subscription by user_id
+// @Description  Get subscription by user_id
+// @Tags         subscriptions
+// @Produce      json
+// @Param        user_id path        string true "user UUID"
+// @Success      200     {object}    dto.Subscription
+// @Failure      400     string     "user_id (UUID) not found"
+// @Failure      404     string     "Subscription not found"
+// @Failure      500     string		  "Internal error"
+// @Router       /subscriptions/user/{user_id} [get]
 func (h *Handler) GetByUserId(w http.ResponseWriter, r *http.Request) {
 	userId := chi.URLParam(r, "user_id")
 	userUUID, err := uuid.Parse(userId)
@@ -138,6 +150,15 @@ func (h *Handler) GetByUserId(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(list)
 }
 
+// @Summary      Delete subscription by its id
+// @Description  Delete subscription by its Serial Primary Key
+// @Tags         subscriptions
+// @Produce      plain
+// @Param        id      path        int true "Serial primary key"
+// @Success      204
+// @Failure      400     string     "user_id (UUID) not found"
+// @Failure      500     string		  "Internal error"
+// @Router       /subscriptions/{id} [delete]
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	idParsed, err := strconv.Atoi(id)
@@ -159,6 +180,16 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// @Summary      Update subscription by its id
+// @Description  Update subscription by its Serial Primary Key
+// @Tags         subscriptions
+// @Produce      plain
+// @Param        id      path        int true "Serial primary key"
+// @Param        request body        dto.Subscription true "Subscription data"
+// @Success      204
+// @Failure      400     string     "user_id (UUID) not found"
+// @Failure      500     string		  "Internal error"
+// @Router       /subscriptions/{id} [put]
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	idParsed, err := strconv.Atoi(id)
@@ -190,6 +221,17 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// @Summary      Get subscription by id
+// @Description  Get subscription by it's serial primary key
+// @Tags         subscriptions
+// @Produce      json
+// @Param        user_id      query       string false "user_id (UUID)"
+// @Param        servuce_name query       string false "Service name"
+// @Param        start_date   query       string false "Start date (MM-YYYY)"
+// @Param        end_date     query       string false "End date (MM-YYYY)"
+// @Success      200     plain       "Sum"
+// @Failure      500     string		  "Internal error"
+// @Router       /subscriptions/sum [get]
 func (h *Handler) Sum(w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("user_id")
 	serviceName := r.URL.Query().Get("service_name")
